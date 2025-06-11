@@ -1,0 +1,131 @@
+try:
+    import firedrake
+except ImportError:
+    !wget "https://fem-on-colab.github.io/releases/firedrake-install-release-real.sh" -O "/tmp/firedrake-install.sh" && bash "/tmp/firedrake-install.sh"
+    import firedrake
+
+# imports
+from firedrake import *
+import numpy
+from numpy import linalg as LA
+import math
+from ufl import indices
+
+# constants
+l1 = Constant(1)
+l2 = Constant(0)
+l3 = Constant(0)
+
+a0 = Constant(1)
+a2 = Constant(7.502104)
+a3 = Constant(60.975813)
+a4 = Constant(66.519069)
+
+eta = Constant(1)
+
+s0 = Constant((a3 + math.sqrt(a3*a3 + 24*a2*a4))/(4*a4 ))
+
+
+# chosen orthonormal basis for S_0
+E1 = as_matrix([[math.sqrt(2)/2, 0],
+               [0, -math.sqrt(2)/2]])
+E2 = as_matrix([[0, math.sqrt(2)/2],
+               [math.sqrt(2)/2, 0]])
+
+# conversion from a tensor to a linear combination of orthonormal bases
+def tensor_to_vector(Q):
+  # Steven - added the missing factor of sqrt(2) for the conversion
+    q1 = math.sqrt(2)*Q[0][0]
+    q2 = math.sqrt(2)*Q[0][1]
+    return [q1, q2]
+
+# conversion from a normal vector to its Q-tensor representation
+def vector_to_tensor(q):
+    q1 = q[0]
+    q2 = q[1]
+    Q = as_matrix(q1*E1 + q2*E2)
+    return Q
+
+def bc_to_tensor(n):
+    Q = s0*(np.outer(n,n)-0.5*np.identity(2))
+    return Q
+
+
+# problem 1
+
+mesh = UnitSquareMesh(10, 10)
+V = VectorFunctionSpace(mesh, "CG", 1, 2)
+
+# trial and test function setup
+q = Function(V, name="soln")
+p = TestFunction(V)
+
+Q = vector_to_tensor(q)
+P = vector_to_tensor(p)
+
+#F = (l1*inner(grad(Q),grad(P)) + (1/(eta**2))* (-a2*tr(Q*P)-a3*tr((Q*Q)*P)+a4*tr(Q*Q)*tr(Q*P))) * dx - without l2,l3 terms
+# adding those terms:
+i, j, k = indices(3)
+F = (l1*inner(grad(Q), grad(P)) + l2*inner(div(Q), div(P))+ l3*grad(P)[i,j,k] * grad(Q)[i,k,j] +
+ (1/eta**2)*(-a2*tr(Q*P)-a3*tr(Q*Q*P)+a4*tr(Q*Q)*tr(Q*P))) * dx
+
+# Dirichlet BC
+bc1 = DirichletBC(V, Constant(tensor_to_vector(bc_to_tensor([1,0]))), "on_boundary")
+solve(F == 0, q, bcs = bc1)
+
+# directly write q into the file
+# VTKFile("solution_2.pvd").write(q)
+
+# directly write q1,q2 into the file
+q1 = Function(FunctionSpace(mesh, "CG", 1), name="q1")
+q2 = Function(FunctionSpace(mesh, "CG", 1), name="q2")
+
+q1.interpolate(q[0])
+q2.interpolate(q[1])
+
+VTKFile("solution_1.pvd").write(q1, q2)
+
+# problem 2
+
+mesh = UnitDiskMesh(5)
+V = VectorFunctionSpace(mesh, "CG", 1, 2)
+x, y = SpatialCoordinate(mesh)
+
+# trial and test function setup
+q = Function(V, name="soln")
+p = TestFunction(V)
+
+Q = vector_to_tensor(q)
+P = vector_to_tensor(p)
+
+#F = (l1*inner(grad(Q),grad(P)) + (1/(eta**2))* (-a2*tr(Q*P)-a3*tr((Q*Q)*P)+a4*tr(Q*Q)*tr(Q*P))) * dx - without l2,l3 terms
+# adding those terms:
+i, j, k = indices(3)
+F = (l1*inner(grad(Q), grad(P)) + l2*inner(div(Q), div(P))+ l3*grad(P)[i,j,k] * grad(Q)[i,k,j] +
+ (1/eta**2)*(-a2*tr(Q*P)-a3*tr(Q*Q*P)+a4*tr(Q*Q)*tr(Q*P))) * dx
+
+# Dirichlet BC
+bdy_Q = Function(V)
+#bdy_q.interpolate(as_vector([s0 * math.sqrt(2) * (x**2 - 0.5), s0 * math.sqrt(2) * x * y]))
+#print(type(s))
+#print(type(s0))
+#print(type(sqrt(2)))
+#print(type(x))
+#print(type(0.5))
+bdy_Q.interpolate(as_vector([s0 * sqrt(2) * ( x * x/(x * x + y * y) - 0.5 ), s0 * sqrt(2) * x * y / (x * x+y * y) ]))
+
+bc2 = DirichletBC(V, bdy_Q, "on_boundary")
+solve(F == 0, q, bcs=bc2)
+
+# directly write q into the file
+# VTKFile("solution_2.pvd").write(q)
+
+# directly write q1,q2 into the file
+q1 = Function(FunctionSpace(mesh, "CG", 1), name="q1")
+q2 = Function(FunctionSpace(mesh, "CG", 1), name="q2")
+
+q1.interpolate(q[0])
+q2.interpolate(q[1])
+
+VTKFile("solution_2.pvd").write(q1, q2)
+
