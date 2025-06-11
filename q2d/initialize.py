@@ -1,10 +1,5 @@
-try:
-    import firedrake
-except ImportError:
-    !wget "https://fem-on-colab.github.io/releases/firedrake-install-release-real.sh" -O "/tmp/firedrake-install.sh" && bash "/tmp/firedrake-install.sh"
-    import firedrake
-
 # imports
+import firedrake
 from firedrake import *
 import numpy
 from numpy import linalg as LA
