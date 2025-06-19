@@ -13,6 +13,6 @@ def elastic_energy(Q,P):
 # returns the weak form of the bulk energy equation before integration
 def bulk_energy(Q,P):
     a2_term = (-1)*constants.a2*firedrake.tr(Q*P)
-    a3_term = (-1)*constants.a3*firedrake.tr((Q*Q)*P)
+    a3_term = (-1)*constants.a3*firedrake.tr((Q*Q)*P) # note that this 3d term computes to 0, so it is not necessary to consider
     a4_term = constants.a4*firedrake.tr(Q*Q)*firedrake.tr(Q*P)
     return (1/(constants.eta**2))*(a2_term+a3_term+a4_term)
