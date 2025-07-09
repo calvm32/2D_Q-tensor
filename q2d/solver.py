@@ -33,5 +33,5 @@ def solver(mesh, bc_vector, bc_type) :
     q1.interpolate(q[0])
     q2.interpolate(q[1])
 
-    VTKFile("solution_1.pvd").write(q1, q2)
+    VTKFile("solution.pvd").write(q1, q2)
 

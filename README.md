@@ -1,14 +1,6 @@
-# Q-tensor 3D
+# Q-tensor 2D
 
-"Q-tensor 3D" is an implementation of the Landau-de Gennes Q-tensor model for liquid crystals.
-
-## Saves
-
-To use qtensor3d, a save folder needs to be created. The easiest way to do this is to use `qsave` in the following manner:
-```
-qsave -b <savepath>
-```
-where `<savepath>` is the save folder. This will create a save folder with the default settings, cosntants, and uflexpr files.
+"Q-tensor 2D" is an implementation of the Landau-de Gennes Q-tensor model for liquid crystals based on Andrew Hicks' "[Q-tensor 3D](https://github.com/andrewlhicks/q-tensor-3d)".
 
 ## Understanding the settings file
 
@@ -38,16 +30,13 @@ We begin with the `source` setting and may choose `builtin`, `local`, `global`, 
 
 ### Builtin
 
-If using a builtin mesh, the only mesh implemented at the moment is the Box Mesh.
-Let's say we want to create a Box Mesh of length, width and height `x`, `y`, and `z` respectively.
-Moreover, let's let `xn`, `yn`, and `zn` be the number of nodes along the length, width, and height repectively.
-To do this, we set `source` to `builtin`, and set `name` to `BoxMesh xn yn zn x y z`.
-For example, for a slab with a 10 x 10 base and a height of 0.2, with a mesh size of 0.1, we would implement it as follows:
+If using a builtin mesh, you may use any [2d mesh from Firedrake](https://www.firedrakeproject.org/_modules/firedrake/utility_meshes.html). For example, 
 ```
 mesh:
   source: builtin
-  name: BoxMesh 10 10 2 1 1 0.2
+  name: RectangleMesh 10 10 1 1
 ```
+corresponds with a 10cells by 10cells rectangle with N=10 divisions per cell.
 
 ### Local
 
