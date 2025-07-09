@@ -3,7 +3,7 @@ from firedrake import *
 import weak_forms
 import tensor_conversion
 
-def solve(mesh, bc_vector, bc_type) :
+def solver(mesh, bc_vector, bc_type) :
     V = VectorFunctionSpace(mesh, "CG", 1, 2)
 
     # trial and test function setup
