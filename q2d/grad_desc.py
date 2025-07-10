@@ -23,7 +23,7 @@ while True:
       F_total = F_time + F_elastic + F_bulk
 
       # Solve
-      firedrake.solve(F_total == 0, q, bcs=bc2)
+      solve(F_total == 0, q, bcs=bc2)
 
       # Track energy
       energy = assemble(energy_eq(q))
