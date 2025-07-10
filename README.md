@@ -1,66 +1,36 @@
 # Q-tensor 2D
 
-"Q-tensor 2D" is an implementation of the Landau-de Gennes Q-tensor model for liquid crystals based on Andrew Hicks' "[Q-tensor 3D](https://github.com/andrewlhicks/q-tensor-3d)".
+"*Q-tensor 2D*" is an implementation of the Landau-de Gennes Q-tensor model for liquid crystals based on Andrew Hicks' "[*Q-tensor 3D*](https://github.com/andrewlhicks/q-tensor-3d)". Unlike *Q-tensor 3D*, this repository is designed to be run locally. To do so, simply download the repository and begin changing values in the files under the **user_settings** folder.
 
-## Understanding the settings file
+## Understanding the "**settings**" file
 
-Settings files are in the '.yml' format. Visit [PyYAML](https://pyyaml.org/wiki/PyYAMLDocumentation) for more information.
+This file allows the user to control various settings relating to the mesh, boundary condition, and solving method.
 
-- `mesh`:
-  - `source` - `builtin`, `local`, or `global`
-  - `name` - See "Choosing a mesh" for more info
-  - `refs` - How many refinements of the mesh to complete
-- `options`:
-  - `strong_boundary` - May be given as a number or a list of numbers; specifies those boundaries where Dirichlet conditions will be enforced
-  - `weak_boundary` - May be given as a number or a list of numbers; specifies those boundaries where weak conditions will be enforced
-- `pde`:
-  - `grad_desc` - If true, will use gradient descent to solve PDE
-  - `tol_u` - lower tolerance for dynamic solver
-  - `tol_l` - upper tolerance for dynamic solver
-  - `tol` - tolerance for finding a solution
-- `time`:
-  - `num` - Number of time steps
-  - `save_every` - Number of time steps at which to save the simulation
-  - `step` - The step size
+| Name in settings file | Meaning of setting |
+| ---             | --- |
+| PDE settings    | --- |
+| mesh            | Region on which the PDE is solved |
+| bc_vector       | Vector governing boundary condition |
+| bc_type         | What type of boundary condition is used |
+| Solver settings | --- |
+| grad_desc       | If true, will use gradient descent to solve PDE |
+| tol_u           | Upper tolerance for dynamic solver |
+| tol_l           | Lower tolerance for dynamic solver |
+| tol             | Tolerance for finding a solution |
+| num             | Number of time steps |
+| step            | The step size |
 
-## Choosing a mesh
+### PDE settings: choosing a mesh
 
-To choose a mesh, we go into our `settings.yml` file and edit the settings listed under `mesh`.
-We begin with the `source` setting and may choose `builtin`, `local`, `global`, or `legacy`.
+You may use any 2d mesh [built into Firedrake](https://www.firedrakeproject.org/_modules/firedrake/utility_meshes.html).
 
-### Builtin
+### Solver settings: gradient descent
 
-If using a builtin mesh, you may use any [2d mesh from Firedrake](https://www.firedrakeproject.org/_modules/firedrake/utility_meshes.html). For example, 
-```
-mesh:
-  source: builtin
-  name: RectangleMesh 10 10 1 1
-```
-corresponds with a 10cells by 10cells rectangle with N=10 divisions per cell.
+This is a time-stepping method for finding a solution at equilibrium, as opposed to the first solution.
 
-### Local
+## Understanding the "**init_cond**" file
 
-To use a local mesh, simply save a `.msh` file inside of the save folder.
-For example, if we want to use a mesh named `mesh.msh` located in our save folder, we implement the following settings:
-```
-mesh:
-  source: local
-  name: mesh.msh
-```
-
-### Global
-
-To use a mesh saved at an absolute file path, specify the absolute path.
-For example, if we have a mesh located at `/scratch/username/meshes/mesh.msh`, we would implement is as follows:
-```
-mesh:
-  source: global
-  name: /scratch/username/meshes/mesh.msh
-```
-
-## Understanding the user expression file
-
-The file `userexpr.yml` allows the user to input custom expressions for the initial condition _q-vector_ (`initcond`), the weak boundary _director_ (`w_bdy_nu`), the strong boundary _q-vector_ (`sbdy`), the manufactured _q-vector_ (`manu_q`), the forcing right hand side _q-vector_ on the bulk (`forcing_f`), and the forcing right hand side _q-vector_ on the boundary (`forcing_g`).
+This file allows the user to input custom expressions for the initial condition _q-vector_ (`initcond`), the weak boundary _director_ (`w_bdy_nu`), the strong boundary _q-vector_ (`sbdy`), the manufactured _q-vector_ (`manu_q`), the forcing right hand side _q-vector_ on the bulk (`forcing_f`), and the forcing right hand side _q-vector_ on the boundary (`forcing_g`).
 
 ### Creating user expressions using UFL objects
 
@@ -92,7 +62,9 @@ __Example:__
 initcond: !qvector from_director([cos(5*x2),sin(5*x2),0])
 ```
 
-## Understanding the constants file
+## Understanding the "**constants**" file
+
+This file allows the user to control various constants relating to the PDE, which may be determined by specific lab experiments or chosen by the user.
 
 | Name in constants file | Name in Hicks' dissertation | Meaning of constant |
 | --- | --- | --- |

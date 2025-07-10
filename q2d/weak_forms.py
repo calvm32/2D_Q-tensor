@@ -1,5 +1,5 @@
 import firedrake
-import constants
+import user_settings.constants as constants
 from ufl import indices
 
 # returns the weak form of the elastic energy equation before integration

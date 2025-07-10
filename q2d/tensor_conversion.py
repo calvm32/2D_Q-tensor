@@ -1,7 +1,7 @@
 import firedrake
 import numpy as np
 import math
-import constants
+import user_settings.constants as constants
 
 # chosen orthonormal basis for S_0
 E1 = firedrake.as_matrix([[math.sqrt(2)/2, 0],
