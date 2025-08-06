@@ -2,6 +2,13 @@
 
 "*Q-tensor 2D*" is an implementation of the Landau-de Gennes Q-tensor model for liquid crystals based on Andrew Hicks' "[*Q-tensor 3D*](https://github.com/andrewlhicks/q-tensor-3d)". Unlike *Q-tensor 3D*, this repository is designed to be run locally. To do so, simply download the repository and begin changing values in the files under the **user_settings** folder.
 
+When your solution is written to a .pvd file, open it in your software (we use Paraview), and 
+1. select the input as **q1**
+2. navigate to filters > programmable > programmable filter
+3. run the script from the "**paraview**" file in the "**scripts**" folder
+4. navigate to filters > common > glyph
+5. change the input array to **n** and optionally adjust other features
+
 ## Understanding the "**settings**" file
 
 This file allows the user to control various settings relating to the mesh, boundary condition, and solving method.
@@ -31,36 +38,6 @@ This is a time-stepping method for finding a solution at equilibrium, as opposed
 ## Understanding the "**init_cond**" file
 
 This file allows the user to input custom expressions for the initial condition _q-vector_ (`initcond`), the weak boundary _director_ (`w_bdy_nu`), the strong boundary _q-vector_ (`sbdy`), the manufactured _q-vector_ (`manu_q`), the forcing right hand side _q-vector_ on the bulk (`forcing_f`), and the forcing right hand side _q-vector_ on the boundary (`forcing_g`).
-
-### Creating user expressions using UFL objects
-
-Using UFL objects is now the preferred method to specify user expressions.
-The two major classes of UFL objects that the user can specify are _q-vectors_ (using the `!qvector` flag) and _directors_ (using the `!director` flag).
-Vector objects (3-dimensional) are only used for the weak boundary director (`w_bdy_nu`), while q-vector objects (5-dimensional) are used for everything else.
-
-Besides the hundreds of already available objects in the standard UFL library, there are several additional functions available to the user, most of which can be nested inside of each other:
-
-#### `as_vector`
-
-Outputs a vector of any dimension; thus can be used to specify a q-vector or a director object.
-
-__Example:__
-```
-initcond: !qvector as_vector([x0**2, x0+x1, x1+x2, 1, 0])
-```
-Another example:
-```
-w_bdy_nu: !director as_vector([0,0,1])
-```
-
-#### `from_director`
-
-Outputs a q-vector from a given director.
-
-__Example:__
-```
-initcond: !qvector from_director([cos(5*x2),sin(5*x2),0])
-```
 
 ## Understanding the "**constants**" file
 
